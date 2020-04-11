@@ -187,13 +187,30 @@
                     dt.button('edit:name').action(function (e, dt, node, config) {
                         that._openEditModal();
 
-                        $(`#altEditor-edit-form-${that.random_id}`)
-                        .off('submit')
-                        .on('submit', function (e) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        var handleEditEvent = (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
                             that._editRowData();
-                        });
+                        }
+
+                        var editFormSelector = `#altEditor-edit-form-${that.random_id}`;
+
+                        // Edit button clicked
+                        $(editFormSelector)
+                            .off('submit')
+                            .on('submit', (event) => {
+                                console.log("Edit button clicked");
+                                handleEditEvent(event);
+                            });
+                        // Enter was pressed
+                        $(editFormSelector)
+                            .keypress((event) => {
+                                var keycode = (event.keyCode ? event.keyCode : event.which);
+                                if (keycode === 13) {
+                                    console.log("Enter pressed");
+                                    handleEditEvent(event);
+                                }
+                            });
                     });
                 }
 
@@ -202,13 +219,31 @@
                     dt.button('delete:name').action(function (e, dt, node, config) {
                         that._openDeleteModal();
 
-                        $(`#altEditor-delete-form-${that.random_id}`)
-                        .off('submit')
-                        .on('submit', function (e) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        var handleDeleteEvent = (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
                             that._deleteRow();
-                        });
+                        }
+
+                        // var deleteFormSelector = `#altEditor-delete-form-${that.random_id}`;
+                        var deleteFormSelector = `#altEditor-modal-${that.random_id}`;
+
+                        // Delete button clicked
+                        $(deleteFormSelector)
+                            .off('submit')
+                            .on('submit', (event) => {
+                                console.log("Delete button clicked");
+                                handleDeleteEvent(event);
+                            });
+                        // Enter was pressed
+                        $(deleteFormSelector)
+                            .keypress((event) => {
+                                var keycode = (event.keyCode ? event.keyCode : event.which);
+                                if (keycode === 13) {
+                                    console.log("Enter pressed");
+                                    handleDeleteEvent(event);
+                                }
+                            });
                     });
                 }
 
@@ -217,13 +252,30 @@
                     dt.button('add:name').action(function (e, dt, node, config) {
                         that._openAddModal();
 
-                        $(`#altEditor-add-form-${that.random_id}`)
-                        .off('submit')
-                        .on('submit', function (e) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        var handleAddEvent = (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
                             that._addRowData();
-                        });
+                        };
+
+                        var addFormSelector = `#altEditor-add-form-${that.random_id}`;
+
+                        // Add button clicked
+                        $(addFormSelector)
+                            .off('submit')
+                            .on('submit', (event) => {
+                                console.log("Add button clicked");
+                                handleAddEvent(event);
+                            });
+                        // Enter was pressed
+                        $(addFormSelector)
+                            .keypress((event) => {
+                                var keycode = (event.keyCode ? event.keyCode : event.which);
+                                if (keycode === 13) {
+                                    console.log("Enter pressed");
+                                    handleAddEvent(event);
+                                }
+                            });
                     });
                 }
                 
@@ -278,7 +330,6 @@
              * @private
              */
             _openEditModal: function () {
-                
                 var dt = this.s.dt;
                 var adata = dt.rows({
                     selected: true
@@ -320,8 +371,8 @@
                 $(`form[name="altEditor-edit-form-${this.random_id}"] *`).filter(':input[type!="file"]').each(function (i) {
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
-
-                //Getting the textArea from the modal
+		    
+		        //Getting the textArea from the modal
                 $(`form[name="altEditor-edit-form-${this.random_id}"] *`).filter('textarea').each(function (i) {
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
@@ -337,7 +388,7 @@
                         });
                     }
                 });
-                
+
                 console.log(rowDataArray); //DEBUG
 
                 var checkFilesQueued = function() {
@@ -352,7 +403,7 @@
                         setTimeout(checkFilesQueued, 1000);
                     }
                 };
-                
+
                 checkFilesQueued();
             },
 
@@ -362,7 +413,6 @@
              * @private
              */
             _openDeleteModal: function () {
-                
                 var that = this;
                 var dt = this.s.dt;
                 var adata = dt.rows({
@@ -383,7 +433,7 @@
                     if (columnDefs[j].type.indexOf("hidden") >= 0) {
                         data += "<input type='hidden' id='" + columnDefs[j].title + "' value='" + adata.data()[0][columnDefs[j].name] + "'></input>";
                     }
-                    else if (columnDefs[j].type.indexOf("file") < 0) {
+                    else {
                         data += "<div style='margin-left: initial;margin-right: initial;' class='form-group row'><label for='"
                             + that._quoteattr(columnDefs[j].name)
                             + "'>"
@@ -478,7 +528,7 @@
                         title: obj.sTitle,
                         name: (obj.data ? obj.data : obj.mData),
                         type: (obj.type ? obj.type : 'text'),
-			rows: (obj.rows ? obj.rows : '5'),
+			            rows: (obj.rows ? obj.rows : '5'),
                         cols: (obj.cols ? obj.cols : '30'),
                         options: (obj.options ? obj.options : []),
                         readonly: (obj.readonly ? obj.readonly : false),
@@ -559,7 +609,7 @@
                                 + ">" + options
                                 + "</select>";
                         }
-                        //Adding Text Area 
+			            //Adding Text Area
                         else if (columnDefs[j].type.indexOf("textarea") >= 0)
                         {
                             data += "<textarea id='" + this._quoteattr(columnDefs[j].name)
@@ -652,7 +702,7 @@
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
 		    
-                //Getting the textArea from the modal
+		        //Getting the textArea from the modal
                 $(`form[name="altEditor-add-form-${this.random_id}"] *`).filter('textarea').each(function (i) {
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
@@ -668,7 +718,7 @@
                         });
                     }
                 });
-                
+
                 console.log(rowDataArray); //DEBUG
 
                 var checkFilesQueued = function() {
@@ -828,7 +878,7 @@
                 $select.val(oldValue); // if still present, of course
                 $select.trigger('change');
             },
-            
+
             /**
              * Convert file to Base 64 form
              * @see https://stackoverflow.com/questions/36280818
