@@ -24,8 +24,7 @@
         define(['jquery', 'datatables.net'], function ($) {
             return factory($, window, document);
         });
-    }
-    else if (typeof exports === 'object') {
+    } else if (typeof exports === 'object') {
         // CommonJS
         module.exports = function (root, $) {
             if (!root) {
@@ -38,8 +37,7 @@
 
             return factory($, root, root.document);
         };
-    }
-    else {
+    } else {
         // Browser
         factory(jQuery, window, document);
     }
@@ -145,24 +143,29 @@
                 this.language = DataTable.settings.values().next().value.oLanguage.altEditor || {};
                 this.language.modalClose = this.language.modalClose || 'Close';
                 this.language.edit = this.language.edit || {};
-                this.language.edit = { title: this.language.edit.title || 'Edit record',
-                                       button: this.language.edit.button || 'Edit'
-                                     };
+                this.language.edit = {
+                    title: this.language.edit.title || 'Edit record',
+                    button: this.language.edit.button || 'Edit'
+                };
                 this.language.delete = this.language.delete || {};
-                this.language.delete = { title: this.language.delete.title || 'Delete record',
-                                         button: this.language.delete.button || 'Delete' };
+                this.language.delete = {
+                    title: this.language.delete.title || 'Delete record',
+                    button: this.language.delete.button || 'Delete'
+                };
                 this.language.add = this.language.add || {};
-                this.language.add = { title: this.language.add.title || 'Add record',
-                                      button: this.language.add.button || 'Add'
-                                    };
+                this.language.add = {
+                    title: this.language.add.title || 'Add record',
+                    button: this.language.add.button || 'Add'
+                };
                 this.language.success = this.language.success || 'Success!';
                 this.language.error = this.language.error || {};
-                this.language.error = { message: this.language.error.message || 'There was an unknown error!',
-                                        label: this.language.error.label || 'Error!',
-                                        responseCode: this.language.error.responseCode || 'Response code: ',
-                                        required: this.language.error.required || 'Field is required',
-                                        unique: this.language.error.unique || 'Duplicated field'
-                                      };
+                this.language.error = {
+                    message: this.language.error.message || 'There was an unknown error!',
+                    label: this.language.error.label || 'Error!',
+                    responseCode: this.language.error.responseCode || 'Response code: ',
+                    required: this.language.error.required || 'Field is required',
+                    unique: this.language.error.unique || 'Duplicated field'
+                };
                 var modal = '<div class="modal fade" id="' + modal_id + '" tabindex="-1" role="dialog">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -278,9 +281,9 @@
                             });
                     });
                 }
-                
+
                 // bind 'unique' error messages
-                $(this.modal_selector).bind('input', '[data-unique]', function(elm) {
+                $(this.modal_selector).bind('input', '[data-unique]', function (elm) {
                     if ($(elm.target).attr('data-unique') == null || $(elm.target).attr('data-unique') === 'false') {
                         return;
                     }
@@ -298,7 +301,7 @@
                         }
                     }
                 });
-                        
+
                 // add Refresh button
                 if (this.s.dt.button('refresh:name')) {
                     this.s.dt.button('refresh:name').action(function (e, dt, node, config) {
@@ -334,13 +337,13 @@
                 var adata = dt.rows({
                     selected: true
                 });
-                
+
                 var columnDefs = this.completeColumnDefs();
                 var data = this.createDialog(columnDefs, this.language.edit.title, this.language.edit.button,
                     this.language.modalClose, 'editRowBtn', 'altEditor-edit-form');
 
                 var selector = this.modal_selector;
-                
+
                 for (var j in columnDefs) {
                     var arrIndex = "['" + columnDefs[j].name.toString().split(".").join("']['") + "']";
                     var selectedValue = eval("adata.data()[0]" + arrIndex);
@@ -348,7 +351,7 @@
                     $(selector).find(jquerySelector).val(this._quoteattr(selectedValue));
                     $(selector).find(jquerySelector).trigger("change"); // required by select2
                 }
-                
+
                 $(selector + ' input[0]').focus();
                 $(selector).trigger("alteditor:some_dialog_opened").trigger("alteditor:edit_dialog_opened");
             },
@@ -371,34 +374,23 @@
                 $(`form[name="altEditor-edit-form-${this.random_id}"] *`).filter(':input[type!="file"]').each(function (i) {
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
-		    
-		        //Getting the textArea from the modal
+
+                //Getting the textArea from the modal
                 $(`form[name="altEditor-edit-form-${this.random_id}"] *`).filter('textarea').each(function (i) {
                     rowDataArray[$(this).attr('id')] = $(this).val();
-                });
-
-                //Getting Files from the modal
-                var numFilesQueued = 0;
-                $(`form[name="altEditor-edit-form-${this.random_id}"] *`).filter(':input[type="file"]').each(function (i) {
-                    if ($(this).prop('files')[0]) {
-                        ++numFilesQueued;
-                        that.getBase64($(this).prop('files')[0], function(filecontent) {
-                            rowDataArray[$(this).attr('id')] = filecontent;
-                            --numFilesQueued;
-                        });
-                    }
                 });
 
                 console.log(rowDataArray); //DEBUG
 
                 var checkFilesQueued = function() {
-                    if (numFilesQueued == 0) {
-                        that.onEditRow(that,
-                            rowDataArray,
-                            function(data,b,c,d,e){ that._editRowCallback(data,b,c,d,e); },
-                            function(data){ that._errorCallback(data);
-                        });
-                    } else {
+                    if (numFilesQueued == 0) {that.onEditRow(that,
+                    rowDataArray,
+                    function (data, b, c, d, e) {
+                        that._editRowCallback(data, b, c, d, e);
+                            },
+                    function (data) {
+                        that._errorCallback(data);
+                    });} else {
                         console.log("Waiting for file base64-decoding...");
                         setTimeout(checkFilesQueued, 1000);
                     }
@@ -425,15 +417,14 @@
                 // we should use createDialog()
                 // var data = this.createDialog(columnDefs, this.language.delete.title, this.language.delete.button,
                 //      this.language.modalClose, 'deleteRowBtn', 'altEditor-delete-form');
-                
+
                 // Building delete-modal
                 var data = "";
 
                 for (var j in columnDefs) {
                     if (columnDefs[j].type.indexOf("hidden") >= 0) {
                         data += "<input type='hidden' id='" + columnDefs[j].title + "' value='" + adata.data()[0][columnDefs[j].name] + "'></input>";
-                    }
-                    else {
+                    } else {
                         data += "<div style='margin-left: initial;margin-right: initial;' class='form-group row'><label for='"
                             + that._quoteattr(columnDefs[j].name)
                             + "'>"
@@ -489,15 +480,18 @@
                 for (var i = 0; i < dt.context[0].aoColumns.length; i++) {
                     // .data is the attribute name, if any; .idx is the column index, so it should always exists 
                     var name = dt.context[0].aoColumns[i].data ? dt.context[0].aoColumns[i].data :
-                            dt.context[0].aoColumns[i].mData ? dt.context[0].aoColumns[i].mData :
+                        dt.context[0].aoColumns[i].mData ? dt.context[0].aoColumns[i].mData :
                             dt.context[0].aoColumns[i].idx;
                     jsonDataArray[name] = adata.data()[0][name];
                 }
                 that.onDeleteRow(that,
                     jsonDataArray,
-                    function(data){ that._deleteRowCallback(data); },
-                    function(data){ that._errorCallback(data);
-                });
+                    function (data) {
+                        that._deleteRowCallback(data);
+                    },
+                    function (data) {
+                        that._errorCallback(data);
+                    });
             },
 
             /**
@@ -515,10 +509,10 @@
                 $(selector + ' input[0]').focus();
                 $(selector).trigger("alteditor:some_dialog_opened").trigger("alteditor:add_dialog_opened");
             },
-            
+
             /**
-            * Complete DataTable.context[0].aoColumns with default values
-            */
+             * Complete DataTable.context[0].aoColumns with default values
+             */
             completeColumnDefs: function () {
                 var columnDefs = [];
                 var dt = this.s.dt;
@@ -528,7 +522,7 @@
                         title: obj.sTitle,
                         name: (obj.data ? obj.data : obj.mData),
                         type: (obj.type ? obj.type : 'text'),
-			            rows: (obj.rows ? obj.rows : '5'),
+                        rows: (obj.rows ? obj.rows : '5'),
                         cols: (obj.cols ? obj.cols : '30'),
                         options: (obj.options ? obj.options : []),
                         readonly: (obj.readonly ? obj.readonly : false),
@@ -550,23 +544,22 @@
                 }
                 return columnDefs;
             },
-            
+
             /**
-            * Create both Edit and Add dialogs
-            * @param columnDefs as returned by completeColumnDefs()
-            */
-            createDialog: function(columnDefs, title, buttonCaption, closeCaption, buttonClass, formName) {
+             * Create both Edit and Add dialogs
+             * @param columnDefs as returned by completeColumnDefs()
+             */
+            createDialog: function (columnDefs, title, buttonCaption, closeCaption, buttonClass, formName) {
                 formName = [formName, this.random_id].join('-');
                 var data = "";
                 for (var j in columnDefs) {
-                    
+
                     //handle hidden fields
                     if (columnDefs[j].type.indexOf("hidden") >= 0) {
                         data += "<input type='hidden' id='" + columnDefs[j].name + "' ></input>";
-                    }
-                    else {
+                    } else {
                         // handle fields that are visible to the user
-                        data += "<div style='margin-left: initial;margin-right: initial;' class='form-group row' id='alteditor-row-" + this._quoteattr(columnDefs[j].name) +"'>";
+                        data += "<div style='margin-left: initial;margin-right: initial;' class='form-group row' id='alteditor-row-" + this._quoteattr(columnDefs[j].name) + "'>";
                         data += "<div class='col-sm-3 col-md-3 col-lg-3 text-right' style='padding-top:4px;'>";
                         data += "<label for='" + columnDefs[j].name + "'>" + columnDefs[j].title + ":</label></div>";
                         data += "<div class='col-sm-8 col-md-8 col-lg-8'>";
@@ -609,13 +602,12 @@
                                 + ">" + options
                                 + "</select>";
                         }
-			            //Adding Text Area
-                        else if (columnDefs[j].type.indexOf("textarea") >= 0)
-                        {
+                        //Adding Text Area
+                        else if (columnDefs[j].type.indexOf("textarea") >= 0) {
                             data += "<textarea id='" + this._quoteattr(columnDefs[j].name)
                                 + "' name='" + this._quoteattr(columnDefs[j].title)
                                 + "'rows='" + this._quoteattr(columnDefs[j].rows)
-                                + "' cols='"+ this._quoteattr(columnDefs[j].cols)
+                                + "' cols='" + this._quoteattr(columnDefs[j].cols)
                                 + "'>"
                                 + "</textarea>";
                         }
@@ -639,16 +631,16 @@
                                 + " style='overflow:hidden'  class='form-control  form-control-sm' value=''>";
                         }
                         data += "<label id='" + this._quoteattr(columnDefs[j].name) + "label"
-                                + "' class='errorLabel'></label>";
+                            + "' class='errorLabel'></label>";
                         data += "</div><div style='clear:both;'></div></div>";
                     }
                 }
                 // data += "</form>";
-                
+
                 var selector = this.modal_selector;
                 $(selector).on('show.bs.modal', function () {
-                    var btns = '<button type="button" data-content="remove" class="btn btn-default" data-dismiss="modal">'+closeCaption+'</button>' +
-                        '<button type="submit" form="' + formName + '" data-content="remove" class="btn btn-primary" id="'+buttonClass+'">'+buttonCaption+'</button>';
+                    var btns = '<button type="button" data-content="remove" class="btn btn-default" data-dismiss="modal">' + closeCaption + '</button>' +
+                        '<button type="submit" form="' + formName + '" data-content="remove" class="btn btn-primary" id="' + buttonClass + '">' + buttonCaption + '</button>';
                     $(selector).find('.modal-title').html(title);
                     $(selector).find('.modal-body').html(data);
                     $(selector).find('.modal-footer').html(btns);
@@ -663,7 +655,7 @@
 
                 $(selector).modal('show');
                 $(selector + ' input[0]').focus();
-                
+
                 var that = this;
 
                 // enable select 2 items, datepicker, datetimepickerm
@@ -681,13 +673,13 @@
                     // custom onchange triggers
                     if (columnDefs[j].editorOnChange) {
                         var f = columnDefs[j].editorOnChange; // FIXME what if more than 1 editorOnChange ?
-                        $(selector).find("#" + columnDefs[j].name).on('change', function(elm) {
+                        $(selector).find("#" + columnDefs[j].name).on('change', function (elm) {
                             f(elm, that);
                         });
                     }
                 }
             },
-            
+
             /**
              * Callback for "Add" button
              */
@@ -701,8 +693,8 @@
                 $(`form[name="altEditor-add-form-${this.random_id}"] *`).filter(':input[type!="file"]').each(function (i) {
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
-		    
-		        //Getting the textArea from the modal
+
+                //Getting the textArea from the modal
                 $(`form[name="altEditor-add-form-${this.random_id}"] *`).filter('textarea').each(function (i) {
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
@@ -722,18 +714,18 @@
                 console.log(rowDataArray); //DEBUG
 
                 var checkFilesQueued = function() {
-                    if (numFilesQueued == 0) {
-                        that.onAddRow(that,
-                            rowDataArray,
-                            function(data){ that._addRowCallback(data); },
-                            function(data){ that._errorCallback(data);
-                        });
-                    } else {
+                    if (numFilesQueued == 0) {that.onAddRow(that,
+                    rowDataArray,
+                    function (data) {
+                        that._addRowCallback(data);
+                            },
+                    function (data) {
+                        that._errorCallback(data);
+                    });} else {
                         console.log("Waiting for file base64-decoding...");
                         setTimeout(checkFilesQueued, 1000);
                     }
                 };
-
 
             },
 
@@ -741,47 +733,47 @@
              * Called after a row has been deleted on server
              */
             _deleteRowCallback: function (response, status, more) {
-                    var selector = this.modal_selector;
-                    $(selector + ' .modal-body .alert').remove();
+                var selector = this.modal_selector;
+                $(selector + ' .modal-body .alert').remove();
 
-                    var message = '<div class="alert alert-success" role="alert">' +
-                        '<strong>' + this.language.success + '</strong>' +
-                        '</div>';
-                    $(selector + ' .modal-body').append(message);
+                var message = '<div class="alert alert-success" role="alert">' +
+                    '<strong>' + this.language.success + '</strong>' +
+                    '</div>';
+                $(selector + ' .modal-body').append(message);
 
-                    this.s.dt.row({
-                        selected : true
-                    }).remove();
-                    this.s.dt.draw('page');
+                this.s.dt.row({
+                    selected: true
+                }).remove();
+                this.s.dt.draw('page');
 
-                    // Disabling submit button
-                    $("div"+selector).find("button#addRowBtn").prop('disabled', true);
-                    $("div"+selector).find("button#editRowBtn").prop('disabled', true);
-                    $("div"+selector).find("button#deleteRowBtn").prop('disabled', true);
+                // Disabling submit button
+                $("div" + selector).find("button#addRowBtn").prop('disabled', true);
+                $("div" + selector).find("button#editRowBtn").prop('disabled', true);
+                $("div" + selector).find("button#deleteRowBtn").prop('disabled', true);
             },
 
             /**
              * Called after a row has been inserted on server
              */
             _addRowCallback: function (response, status, more) {
-                
-                    //TODO should honor dt.ajax().dataSrc
-                    
-                    var data = (typeof response === "string") ? JSON.parse(response) : response;
-                    var selector = this.modal_selector;
-                    $(selector + ' .modal-body .alert').remove();
 
-                    var message = '<div class="alert alert-success" role="alert">' +
-                        '<strong>' + this.language.success + '</strong>' +
-                        '</div>';
-                    $(selector + ' .modal-body').append(message);
+                //TODO should honor dt.ajax().dataSrc
 
-                    this.s.dt.row.add(data).draw(false);
+                var data = (typeof response === "string") ? JSON.parse(response) : response;
+                var selector = this.modal_selector;
+                $(selector + ' .modal-body .alert').remove();
 
-                    // Disabling submit button
-                    $("div" + selector).find("button#addRowBtn").prop('disabled', true);
-                    $("div" + selector).find("button#editRowBtn").prop('disabled', true);
-                    $("div" + selector).find("button#deleteRowBtn").prop('disabled', true);
+                var message = '<div class="alert alert-success" role="alert">' +
+                    '<strong>' + this.language.success + '</strong>' +
+                    '</div>';
+                $(selector + ' .modal-body').append(message);
+
+                this.s.dt.row.add(data).draw(false);
+
+                // Disabling submit button
+                $("div" + selector).find("button#addRowBtn").prop('disabled', true);
+                $("div" + selector).find("button#editRowBtn").prop('disabled', true);
+                $("div" + selector).find("button#deleteRowBtn").prop('disabled', true);
             },
 
             /**
@@ -789,53 +781,53 @@
              */
             _editRowCallback: function (response, status, more) {
 
-                    //TODO should honor dt.ajax().dataSrc
-                    
-                    var data = (typeof response === "string") ? JSON.parse(response) : response;
-                    var selector = this.modal_selector;
-                    $(selector + ' .modal-body .alert').remove();
+                //TODO should honor dt.ajax().dataSrc
 
-                    var message = '<div class="alert alert-success" role="alert">' +
-                        '<strong>' + this.language.success + '</strong>' +
-                        '</div>';
-                    $(selector + ' .modal-body').append(message);
+                var data = (typeof response === "string") ? JSON.parse(response) : response;
+                var selector = this.modal_selector;
+                $(selector + ' .modal-body .alert').remove();
 
-                    this.s.dt.row({
-                        selected : true
-                    }).data(data);
-                    this.s.dt.draw('page');
+                var message = '<div class="alert alert-success" role="alert">' +
+                    '<strong>' + this.language.success + '</strong>' +
+                    '</div>';
+                $(selector + ' .modal-body').append(message);
 
-                    // Disabling submit button
-                    $("div" + selector).find("button#addRowBtn").prop('disabled', true);
-                    $("div" + selector).find("button#editRowBtn").prop('disabled', true);
-                    $("div" + selector).find("button#deleteRowBtn").prop('disabled', true);
+                this.s.dt.row({
+                    selected: true
+                }).data(data);
+                this.s.dt.draw('page');
+
+                // Disabling submit button
+                $("div" + selector).find("button#addRowBtn").prop('disabled', true);
+                $("div" + selector).find("button#editRowBtn").prop('disabled', true);
+                $("div" + selector).find("button#deleteRowBtn").prop('disabled', true);
             },
 
             /**
              * Called after AJAX server returned an error
              */
             _errorCallback: function (response, status, more) {
-                    var error = response;
-                    var selector = this.modal_selector;
-                    $(selector + ' .modal-body .alert').remove();
-                    var errstr = this.language.error.message;
-                    if (error.responseJSON && error.responseJSON.errors) {
-                        errstr = "";
-                        for (var key in error.responseJSON.errors) {
-                            errstr += error.responseJSON.errors[key][0];
-                        }
+                var error = response;
+                var selector = this.modal_selector;
+                $(selector + ' .modal-body .alert').remove();
+                var errstr = this.language.error.message;
+                if (error.responseJSON && error.responseJSON.errors) {
+                    errstr = "";
+                    for (var key in error.responseJSON.errors) {
+                        errstr += error.responseJSON.errors[key][0];
                     }
-                    var message = '<div class="alert alert-danger" role="alert">' +
-                        '<strong>' + this.language.error.label + '</strong> ' + (error.status == null ? "" : this.language.error.responseCode + error.status) + " " + errstr +
-                        '</div>';
+                }
+                var message = '<div class="alert alert-danger" role="alert">' +
+                    '<strong>' + this.language.error.label + '</strong> ' + (error.status == null ? "" : this.language.error.responseCode + error.status) + " " + errstr +
+                    '</div>';
 
-                    $(selector + ' .modal-body').append(message);
+                $(selector + ' .modal-body').append(message);
             },
-            
+
             /**
              * Default callback for insertion: mock webservice, always success.
              */
-            onAddRow: function(dt, rowdata, success, error) {
+            onAddRow: function (dt, rowdata, success, error) {
                 console.log("Missing AJAX configuration for INSERT");
                 success(rowdata);
             },
@@ -843,7 +835,7 @@
             /**
              * Default callback for editing: mock webservice, always success.
              */
-            onEditRow: function(dt, rowdata, success, error) {
+            onEditRow: function (dt, rowdata, success, error) {
                 console.log("Missing AJAX configuration for UPDATE");
                 success(rowdata);
             },
@@ -851,28 +843,28 @@
             /**
              * Default callback for deletion: mock webservice, always success.
              */
-            onDeleteRow: function(dt, rowdata, success, error) {
+            onDeleteRow: function (dt, rowdata, success, error) {
                 console.log("Missing AJAX configuration for DELETE");
                 success(rowdata);
             },
-            
+
             /**
              * Dinamically reload options in SELECT menu
-            */
-            reloadOptions: function($select, options) {
+             */
+            reloadOptions: function ($select, options) {
                 var oldValue = $select.val();
                 $select.empty(); // remove old options
                 if (options.length > 0) {
                     // array-style select or select2
-                    $.each(options, function(key, value) {
-                      $select.append($("<option></option>")
-                         .attr("value", value).text(value));
+                    $.each(options, function (key, value) {
+                        $select.append($("<option></option>")
+                            .attr("value", value).text(value));
                     });
                 } else {
                     // object-style select or select2
-                    $.each(options, function(key, value) {
-                      $select.append($("<option></option>")
-                         .attr("value", value).text(key));
+                    $.each(options, function (key, value) {
+                        $select.append($("<option></option>")
+                            .attr("value", value).text(key));
                     });
                 }
                 $select.val(oldValue); // if still present, of course
@@ -910,7 +902,7 @@
                 if (Array.isArray(s)) {
                     // for MULTIPLE SELECT
                     var newArray = [];
-		    var x;
+                    var x;
                     for (x in s) newArray.push(s[x]);
                     return newArray;
                 }
