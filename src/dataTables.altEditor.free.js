@@ -49,14 +49,12 @@
     var _instance = 0;
 
     /**
-     * altEditor provides modal editing of records for Datatables
+     * altEditor provides modal editing of records for DataTables
      *
      * @class altEditor
      * @constructor
-     * @param {object}
-     *            oTD DataTables settings object
-     * @param {object}
-     *            oConfig Configuration object for altEditor
+     * @param dt DataTables settings object
+     * @param opts Configuration object for altEditor
      */
     var altEditor = function (dt, opts) {
         if (!DataTable.versionCheck || !DataTable.versionCheck('1.10.8')) {
@@ -64,8 +62,7 @@
         }
 
         // User and defaults configuration object
-        this.c = $.extend(true, {}, DataTable.defaults.altEditor,
-            altEditor.defaults, opts);
+        this.c = $.extend(true, {}, DataTable.defaults.altEditor, altEditor.defaults, opts);
 
         /**
          * @namespace Settings object which contains customisable information
